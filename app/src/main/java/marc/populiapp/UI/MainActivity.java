@@ -12,15 +12,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import marc.customviews.OpenRightView;
 import marc.customviews.OpenRightViewHolder;
+import marc.populiapp.Api.City;
 import marc.populiapp.Api.Tour;
 import marc.populiapp.Api.ToursData;
 import marc.populiapp.Api.ToursLoaders.ToursLoader;
@@ -81,9 +84,8 @@ public class MainActivity extends AppCompatActivity implements TourDetailsFragme
                             @Override
                             public void onTourLoaded(ToursData toursData) {
 
-                                List<Tour> tours = toursData.getTours();
-                                if( tours!=null ){
-                                    populiOpenRightAdapter = new PopuliOpenRightAdapter(tours);
+                                if( toursData!=null ){
+                                    populiOpenRightAdapter = new PopuliOpenRightAdapter(toursData);
                                     handler.post(new Runnable() {
                                         @Override
                                         public void run() {
@@ -119,17 +121,33 @@ public class MainActivity extends AppCompatActivity implements TourDetailsFragme
     // ADAPTER FOR OPEN RIGHt VIEW ( RECYCLER VIEW )
     class PopuliOpenRightAdapter extends OpenRightView.OpenRightAdapter<PopuliOpenRightAdapter.PopuliViewHolder>{
 
-        List<Tour> tourList;
+        List<TourDisplay> tourDisplays = new ArrayList<>();
+        class TourDisplay{
+            Tour tour;
+            boolean isHeader = false;
+        }
 
-        public PopuliOpenRightAdapter(List<Tour> tourList) {
+        public PopuliOpenRightAdapter(ToursData toursData) {
 
-            this.tourList = tourList;
+
+            for(City city : toursData.getCities()){
+
+                for(int t=0 ; t<city.getTours().size() ; t++ ){
+
+                    TourDisplay tourDisplay = new TourDisplay();
+                    tourDisplay.tour = city.getTours().get(t);
+                    if( t==0 ){
+                        tourDisplay.isHeader = true;
+                    }
+                    tourDisplays.add(tourDisplay);
+                }
+            }
         }
 
         @Override
         public Fragment getFragment(int i) {
 
-            Fragment fragment = TourDetailsFragment.newInstance(tourList.get(i));
+            Fragment fragment = TourDetailsFragment.newInstance(  tourDisplays.get(i).tour );
             return fragment;
         }
 
@@ -145,25 +163,38 @@ public class MainActivity extends AppCompatActivity implements TourDetailsFragme
         @Override
         public void onBindOpenRightViewHolder(PopuliViewHolder populiViewHolder, int i) {
 
-            populiViewHolder.textViewTourTitle.setText( tourList.get(i).getTitle() );
-            Picasso.with(context).load(tourList.get(i).getImage() ).into(populiViewHolder.imageViewTour) ;
+            TourDisplay tourDisplay = tourDisplays.get(i);
 
+            populiViewHolder.textViewTourTitle.setText( tourDisplay.tour.getTitle() );
+            Picasso.with(context).load(  tourDisplay.tour.getImage() ).into(populiViewHolder.imageViewTour) ;
+            if( tourDisplay.isHeader ){
+                populiViewHolder.linearLayoutSection.setVisibility(View.VISIBLE);
+                populiViewHolder.textViewCityName.setText(tourDisplay.tour.getCity().getName());
+            }
+            else{
+                populiViewHolder.linearLayoutSection.setVisibility(View.GONE);
+            }
         }
 
         @Override
         public int getItemCount() {
-            return tourList.size();
+            return tourDisplays.size();
         }
 
         class PopuliViewHolder extends OpenRightViewHolder{
 
             TextView textViewTourTitle;
             ImageView imageViewTour;
+            TextView textViewCityName;
+            LinearLayout linearLayoutSection;
 
             public PopuliViewHolder(View itemView) {
                 super(itemView);
                 textViewTourTitle = (TextView) itemView.findViewById(R.id.textViewTourTitle);
                 imageViewTour = (ImageView) itemView.findViewById(R.id.imageViewTour);
+                textViewCityName = (TextView) itemView.findViewById(R.id.textViewCityName);
+                linearLayoutSection = (LinearLayout) itemView.findViewById(R.id.linearLayoutSection);
+
             }
         }
 

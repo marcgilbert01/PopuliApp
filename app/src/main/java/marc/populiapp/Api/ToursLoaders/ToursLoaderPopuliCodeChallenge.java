@@ -84,6 +84,8 @@ public class ToursLoaderPopuliCodeChallenge implements ToursLoader{
                cities.add(city);
                for(Tour tour : city.getTours() ){
                    tour.setImage( URL_IMAGES_PATH + tour.getImage() );
+                   tour.setCountry(country);
+                   tour.setCity(city);
                    tours.add(tour);
                }
             }
