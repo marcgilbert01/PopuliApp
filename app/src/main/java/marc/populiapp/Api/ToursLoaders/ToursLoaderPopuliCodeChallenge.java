@@ -25,6 +25,9 @@ import marc.populiapp.Api.ToursData;
 public class ToursLoaderPopuliCodeChallenge implements ToursLoader{
 
     static final String URL = "http://design.populi.rocks/populi-test-data/countries.json";
+    static final String URL_IMAGES_PATH = "http://design.populi.rocks/populi-test-data/";
+
+
     Context context;
 
     public ToursLoaderPopuliCodeChallenge setContext(Context context) {
@@ -80,6 +83,7 @@ public class ToursLoaderPopuliCodeChallenge implements ToursLoader{
             for(City city : country.getCities()  ){
                cities.add(city);
                for(Tour tour : city.getTours() ){
+                   tour.setImage( URL_IMAGES_PATH + tour.getImage() );
                    tours.add(tour);
                }
             }

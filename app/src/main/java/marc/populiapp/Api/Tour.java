@@ -1,9 +1,14 @@
 package marc.populiapp.Api;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.io.Serializable;
+
 /**
  * Created by gilbertm on 25/05/2016.
  */
-public class Tour {
+public class Tour implements Parcelable{
 
     private String id;
     private String title;
@@ -11,6 +16,25 @@ public class Tour {
     private String desc;
     private City city;
     private Country country;
+
+    protected Tour(Parcel in) {
+        id = in.readString();
+        title = in.readString();
+        image = in.readString();
+        desc = in.readString();
+    }
+
+    public static final Creator<Tour> CREATOR = new Creator<Tour>() {
+        @Override
+        public Tour createFromParcel(Parcel in) {
+            return new Tour(in);
+        }
+
+        @Override
+        public Tour[] newArray(int size) {
+            return new Tour[size];
+        }
+    };
 
     public String getId() {
         return id;
@@ -23,6 +47,24 @@ public class Tour {
     public String getTitle() {
         return title;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(title);
+        dest.writeString(image);
+        dest.writeString(desc);
+    }
+
+
+
+
+
 
     public void setTitle(String title) {
         this.title = title;
@@ -59,4 +101,8 @@ public class Tour {
     public void setCountry(Country country) {
         this.country = country;
     }
+
+
+
+
 }

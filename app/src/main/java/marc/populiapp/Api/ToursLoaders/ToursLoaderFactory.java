@@ -22,7 +22,7 @@ public class ToursLoaderFactory {
 
         ToursLoader toursLoader = null;
         try {
-            toursLoaderType.toursLoader.getClass().newInstance();
+            toursLoader = toursLoaderType.toursLoader.getClass().newInstance();
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
